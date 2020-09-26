@@ -26,12 +26,9 @@ sediment_aes <- list(
   theme(axis.ticks = element_blank(),
         panel.grid.major = element_blank(),
         legend.position = "bottom",
-    #    panel.background = element_blank(),
         panel.border = element_rect(colour = "grey", fill = NA),
         text = element_text(family = "Avenir", size = 10)),
   guides(fill = guide_colourbar(barheight = 0.5, barwidth = 15, title.vjust = 1)),
- coord_equal(ylim = c(5137274, 6864274),
+  coord_equal(ylim = c(5137274, 6864274),
               xlim = c(1689877, 6182403), expand = F),
-#  coord_equal(xlim = c(1689697, 6182582), 
-#              ylim= c(5136724, 6864824)), 
-    labs(x = NULL, y = NULL))
+  labs(x = NULL, y = NULL))

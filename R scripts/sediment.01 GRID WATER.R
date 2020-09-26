@@ -73,12 +73,10 @@ voronoi_grid2 <- function(points, area) {
   
 }
 
-
 tic()
 domains_mask <- expand.grid(Longitude = Space$Lons, Latitude = Space$Lats) %>%  # Get the data grid
   mutate(Longitude = Longitude - 180) %>% 
   st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326, remove = FALSE) %>% # Convert to SF
- # voronoi_grid2(area = domains) %>%                                            # Calculate overlap with domain and share of area per pixel
   st_join(domains) %>%                                                          # which points are in the domain
   drop_na() %>%                                                                 # drop those outside
   mutate(x_index = match(Longitude, Space$Lons - 180) + Space$Limits$Lon_start - 1, # Find x index in the netcdf file each pixel sits at
@@ -88,49 +86,6 @@ toc()
 ggplot(domains_mask) + geom_sf(aes(colour = Region), size = 0.1)                   # Check
 
 saveRDS(domains_mask, "./Objects/ECMWF Targets.rds")                            # Save
-
-# raster <- raster(ECMWF_example[1,]$File)      # Import bathymetry
-# 
-# test <- stars::st_as_stars(raster) %>% 
-#   st_as_sf(points= FALSE)
-# 
-# x <- domains
-# xcrs = sf::st_crs(x)
-# g = (x + c(360, 90)) %% c(360) -c(0,90)
-# g = st_as_sf(g)
-# st_crs(g) <- xcrs
-# g <- mutate(g, Region = c("Barents Sea", "Greenland"))
-# plot(g)
-# 
-# ggplot() +
-#   geom_sf(data = test, colour = NA, aes(fill = Significant.height.of.combined.wind.waves.and.swell), show.legend = FALSE) +
-#   geom_sf(data = g, aes(colour = Region), fill = NA, show.legend = FALSE) +
-#   theme_minimal()
-# 
-# cells <- exactextractr::exact_extract(raster, g, include_cell = TRUE) %>% 
-#   data.table::rbindlist(idcol = "Region") %>% 
-#   mutate(Region = if_else(Region == 1, "Barents Sea", "Greenland"),
-#          x_index = colFromCell(raster, cell),
-#          y_index = rowFromCell(raster, cell),
-#          Longitude = xFromCell(raster, cell),
-#          Latitude = yFromCell(raster, cell)) %>%
-#   mutate(y_index = abs(y_index-max(y_index+1)))                    # Flip y coordinates in reverse because rasters have a weird convention
-#   
-# ggplot() + geom_raster(data = cells, aes(x= x_index, y= y_index, fill = value))
-# 
-# saveRDS(cells, "./Objects/ECMWF Targets.rds")                            # Save
-# 
-# tic()
-# domains_mask <- expand.grid(Longitude = Space$Lons, Latitude = Space$Lats) %>%  # Get the data grid
-#   st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326, remove = FALSE) %>% # Convert to SF
-#   voronoi_grid(area = domains) %>%                                              # Calculate overlap with domain and share of area per pixel
-#   mutate(x_index = match(Longitude, Space$Lons) + Space$Limits$Lon_start - 1,   # Find x index in the netcdf file each pixel sits at
-#          y_index = match(Latitude, Space$Lats) + Space$Limits$Lat_start - 1)    # Find y index in the netcdf file each pixel sits at
-# toc()
-# 
-# ggplot(domains_mask) + geom_sf(aes(fill = Region), lwd = 0.1)                    # Check
-# 
-# saveRDS(domains_mask, "./Objects/ECMWF Targets.rds")                            # Save
 
 #### Tides SINMOD ####
 
@@ -153,8 +108,6 @@ coords <- reshape2::melt(Lons) %>%                                          # Re
 voronoi <- st_as_sf(setDF(coords), coords = c("Longitude", "Latitude"), remove = FALSE, crs = 4326) %>% # Convert to sf 
   st_join(domains) %>% 
   drop_na()
-  #  voronoi_grid(st_transform(domains, crs = 4326)) %>%                       # Work out the share of model domain for each SINMOD pixel
-  #  select(-geometry)                                                         # drop repeated geometry column
 
 ggplot(voronoi) + geom_sf(aes(colour = Depth), size = 0.8)                  # Check
 

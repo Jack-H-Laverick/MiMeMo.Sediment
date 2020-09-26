@@ -37,9 +37,8 @@ toc()
 
 ## Concatenate files
 # Concatenate along time dimension from the start, from SINMOD_blah.nc files, into a tides file
-system(str_glue("ncrcat -d time,0, ./Data/SINMOD/SINMOD_??????.nc ./Data/SINMOD/tides.nc")) 
+system(str_glue("ncrcat -d time,0, ./Data/SINMOD/SINMOD_??????.nc ./Objects/tides.nc")) 
 
-## Delete redudant subsets
+## Delete redundant subsets
 cleaning <- list.files(out_dir, full.names = TRUE) %>%    # What did we create?
-  .[!str_detect(., "tides.nc")] %>%                       # Drop the composite file
-  unlink()                                                # Delete all the other files
+  unlink()                                                # Delete the files

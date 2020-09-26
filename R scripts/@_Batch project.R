@@ -16,15 +16,21 @@ execute <- function(x) {
 #### Batch process scripts ####
 
 scripts <- c(                                            # List scripts in the order you want to run them
-   #"./R scripts/sediment.1 GRID WATER.R",
-   #"./R scripts/sediment.2 CROP SINMOD.R", 
-   #"./R scripts/sediment.3 CROP WAVES.R",
-   #"./R scripts/sediment.4 WATER TS.R",
-   "./R scripts/sediment.5 SHEARSTRESS.R",
-   "./R scripts/sediment.6 RF PREDICTORS.R",
-   "./R scripts/sediment.7 H2O.R"
-  # "./R scripts/sediment.8 HABITAT TYPES.R",
-  # "./R scripts/sediment.9 DISTURBANCE.R"
+#  "./R scripts/sediment.00 DOMAINS.R",
+  "./R scripts/sediment.01 GRID WATER.R",
+  "./R scripts/sediment.02 CROP SINMOD.R", 
+  "./R scripts/sediment.03 CROP WAVES.R",
+  "./R scripts/sediment.04 WATER TS.R",
+  "./R scripts/sediment.05 INTERPOLATE WAVES.R",
+  "./R scripts/sediment.06 SHEARSTRESS.R",
+  "./R scripts/sediment.07 RF PREDICTORS.R",
+  "./R scripts/sediment.08 H2O.R",
+  "./R scripts/sediment.09 SEDIMENT FRACTIONS.R",
+  "./R scripts/sediment.10 WRITE CSV.R",
+  "./R scripts/sediment.11 WRITE NETCDF.R",
+  "./R scripts/sediment.12 SEASONAL STRESS.R",
+  "./R scripts/sediment.13 DISTURBANCE.R"
+#  "./R scripts/sediment.14 WRITE SEASONAL.R"
 ) %>% 
   map(execute)
 

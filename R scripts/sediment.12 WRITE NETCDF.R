@@ -72,17 +72,6 @@ writeRaster(get_raster("Silt"),
              varname= "D50", longname = "Mean grain size", varunit = "mm",
              xname = "Longitude", yname = "Latitude")
 
-writeRaster(get_raster("Stress95"),
-            "./Objects/BSS.nc", overwrite = TRUE, format = "CDF", 
-            varname= "Stress", longname = "Bed shear stress", 
-            varunit = "N.m^-2", xname = "Longitude", yname = "Latitude")
-
-# writeRaster(get_raster("Disturbance),
-#             "./Objects/ND.nc", overwrite = TRUE, format = "CDF", 
-#             varname= "Disturbance", 
-#             longname = "Time shields value exceeds threshold for the initiation of motion", 
-#             varunit = "%", xname = "Longitude", yname = "Latitude")
-
 ## writeRaster(get_raster("Porosity"),
 ##             "./Objects/Porosity.nc", overwrite = TRUE, format = "CDF", 
 ##             varname= "Porosity", longname = "Porosity", 
@@ -100,12 +89,12 @@ writeRaster(get_raster("Stress95"),
 
 #### Combine files ####
 
-# vars <- c("Slope", "TPI", "TRI", "Roughness", "Rock",     # List variable names used in file names
-#           "Gravel", "Sand", "Silt", "D50", "BSS", "ND", 
+# vars <- c("Slope", "TPI", "TRI", "Roughness", "Hard",     # List variable names used in file names
+#           "Gravel", "Sand", "Silt", "D50", 
 #           "Porosity", "Permeability", "OMC") 
 
 vars <- c("Slope", "TPI", "TRI", "Roughness", "Hard",       # List variable names used in file names
-          "Gravel", "Sand", "Silt", "D50", "BSS") 
+          "Gravel", "Sand", "Silt", "D50") 
  
 walk(vars, ~{
   system(str_glue("ncks -A ./Objects/{.x}.nc ./Output/Greenland_and_barents_sea_shelf_sediments.nc")) # In turn bind a variable to the main file
@@ -115,9 +104,6 @@ unlink(str_glue("./Objects/{vars}.nc"))                     # Delete the redunda
 unlink(list.files(path = "./Output", pattern = ".tmp",      # Delete temporary files
                   full.names = TRUE))
 
-## system("ncks -A ./Objects/ND.nc ./Output/Sediment map.nc")
 ### system("ncks -A ./Objects/Porosity.nc ./Output/Sediment map.nc")
 ### system("ncks -A ./Objects/Permeability.nc ./Output/Sediment map.nc")
 ### system("ncks -A ./Objects/OMC.nc ./Output/Sediment map.nc")
-
-#raw <- nc_open("./Output/Greenland_and_barents_sea_shelf_sediments.nc")     # Check the file looks sensible

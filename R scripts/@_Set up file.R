@@ -76,3 +76,8 @@ Greenland_mask <- matrix(c(-44, 77,
   st_sf(Region = "Greenland", geometry = .)
 st_crs(Greenland_mask) <- st_crs(4326)                                          
 #Greenland_mask <- st_transform(Greenland_mask, crs = 3035)
+
+
+### Chunking stress #### 
+
+chunk_length <- 200

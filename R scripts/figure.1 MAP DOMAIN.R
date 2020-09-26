@@ -7,12 +7,16 @@ rm(list=ls())                                                                 # 
 
 Packages <- c("tidyverse", "sf")                                              # List handy data packages
 lapply(Packages, library, character.only = TRUE)                              # Load packages
+source("./R scripts/@_Plotting rules.R")
 
-land <- readRDS("./Objects/Land.rds") %>% st_transform(crs = 3035)            # Import land for plotting
+sea <- readRDS("./Objects/Domain.rds") %>%    # Import mapped areas for plotting
+  st_transform(crs = 3035) %>% 
+  mutate(label = "Model domain")
 
-sea <- readRDS("./Objects/Domain.rds") %>% st_transform(crs = 3035)           # Import mapped areas for plotting
-
-#cells <- readRDS("./Objects/Extracters.rds")                                  # Import cells for zoom to show domain boundary
+marks <- st_as_sf(drop_na(marks), coords = c("x", "y"), crs = crs) %>% 
+  group_by(graticule) %>% 
+  summarise(do_union = F) %>% 
+  st_cast("LINESTRING") 
 
 #### Inset ####
 
@@ -23,24 +27,24 @@ point <- data.frame(x= 25, y = 75, region = "inset") %>%
 inset_grid <- readRDS("./Objects/inset.rds")
 
 inset <- ggplot() +
-  geom_sf(data = inset_grid, fill = "yellow", colour = "black", size = 0.1) +
+  geom_sf(data = inset_grid, fill = "gold", colour = "black", size = 0.1) +
   theme_void() +
   NULL
 
 #### Main map ####
 
-box <- st_bbox(sea)
-    
 map <- ggplot() +
-  geom_sf(data = land, fill = "black", size = 0.05) +
-  geom_sf(data = sea, fill = "yellow", colour = "yellow3", size = 0.05) +
+  ggpubr::background_image(png::readPNG("./Figures/background.png")) +
+  geom_sf(data = marks, aes(), colour = "grey", size = 0.2) + # Add Graticules 
+  geom_sf(data = sea, fill = "gold", colour = "gold4", size = 0.05) +
   geom_sf(data = point, colour = "tan3") +                                     # Mark the zoom location
-  coord_sf(xlim = c(box$xmin, box$xmax), ylim = c(box$ymin, box$ymax)) +
-  theme_minimal() +
+  coord_sf(ylim = c(5137274, 6864274), xlim = c(1689877, 6182403), expand = F) +
+  scale_y_continuous(breaks = 60) +
+  scale_x_continuous(breaks = c(-30, 0, 30)) +
+#  theme_minimal() +
   theme(text = element_text(family = "Avenir", size = 10),
-        panel.background = element_blank(),
-        panel.border = element_rect(colour = "grey", fill = NA)
-  ) +
+        panel.border = element_rect(colour = "grey", fill = NA)) +
+  facet_wrap(vars(label)) +
   NULL
     
 map
@@ -65,4 +69,4 @@ final <- map +                                                                 #
   NULL
 final
 
-#ggsave("./Figures/Figure 1.png", width = 10, height = 7, units = "cm", dpi = 1500)
+ggsave("./Figures/Figure 1.png", width = 10, height = 7, units = "cm", dpi = 1500)

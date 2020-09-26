@@ -30,7 +30,7 @@ Predictions <- readRDS("./Objects/Full sediment.rds") %>%
 #### Join data ####
 
 Everything <- left_join(To_predict, Predictions, by = c("x", "y")) %>% # Join by pixel
-  rename(Longitude = "y", Latitude = "x", TRI = "tri",                 # Rename variables 
+  rename(Longitude = "x", Latitude = "y", TRI = "tri",                 # Rename variables 
          TPI = "tpi", Roughness = "roughness", Slope = "slope") %>% 
   st_sf()                                                              # Reinstate SF class
 
@@ -44,8 +44,6 @@ data.table::fwrite(st_drop_geometry(Everything),
                    "./Output/Greenland_and_barents_sea_shelf_sediments.csv")     # Save csv appendix
 
 #### Write one file per variable ####
-
-## system("ncks -A ./Objects/ND.nc ./Output/Sediment map.nc")
 
 ### system("ncks -A ./Objects/Porosity.nc ./Output/Sediment map.nc")
 ### system("ncks -A ./Objects/Permeability.nc ./Output/Sediment map.nc")
