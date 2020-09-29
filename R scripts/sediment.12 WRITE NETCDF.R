@@ -13,7 +13,7 @@ data <- readRDS("./Objects/Everything.rds") %>%
 
 get_raster <- function(var) {
   
-  raster <- data[,c("Latitude", "Longitude", var)] %>% 
+  raster <- data[,c("Longitude", "Latitude", var)] %>% 
   rasterFromXYZ()
   
   #rasterFromXYZ(dplyr::select(data, Latitude, Longitude, var))
