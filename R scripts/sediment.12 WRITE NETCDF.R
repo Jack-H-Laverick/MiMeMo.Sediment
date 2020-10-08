@@ -47,29 +47,29 @@ writeRaster(get_raster("Roughness"),
             varname= "Roughness", longname = "Roughness", varunit = "m",
             xname = "Longitude", yname = "Latitude")
 
-writeRaster(get_raster("Hard"),
-            "./Objects/Hard.nc", overwrite = TRUE, format = "CDF", 
-            varname= "Hard", longname = "Areas of solid substrate", varunit = "Logical, 1 = True",
+writeRaster(get_raster("Rock"),
+            "./Objects/Rock.nc", overwrite = TRUE, format = "CDF", 
+            varname= "Rock", longname = "Areas of solid substrate", varunit = "Logical, 1 = True",
             xname = "Longitude", yname = "Latitude")
 
 writeRaster(get_raster("Gravel"),
             "./Objects/Gravel.nc", overwrite = TRUE, format = "CDF", 
-            varname= "Gravel", longname = "Percent bottom cover as gravel", varunit = "%",
+            varname= "Gravel", longname = "Percent sediment composition gravel", varunit = "%",
             xname = "Longitude", yname = "Latitude")
 
 writeRaster(get_raster("Sand"),
             "./Objects/Sand.nc", overwrite = TRUE, format = "CDF", 
-            varname= "Sand", longname = "Percent bottom cover as sand", varunit = "%",
+            varname= "Sand", longname = "Percent sediment composition sand", varunit = "%",
             xname = "Longitude", yname = "Latitude")
 
 writeRaster(get_raster("Silt"),
             "./Objects/Silt.nc", overwrite = TRUE, format = "CDF", 
-            varname= "Silt", longname = "Percent bottom cover as silt", varunit = "%",
+            varname= "Silt", longname = "Percent sediment composition silt", varunit = "%",
             xname = "Longitude", yname = "Latitude")
 
- writeRaster(get_raster("D50"),
-             "./Objects/D50.nc", overwrite = TRUE, format = "CDF", 
-             varname= "D50", longname = "Mean grain size", varunit = "mm",
+ writeRaster(get_raster("Dxbar"),
+             "./Objects/Dxbar.nc", overwrite = TRUE, format = "CDF", 
+             varname= "Dxbar", longname = "Mean grain size", varunit = "mm",
              xname = "Longitude", yname = "Latitude")
 
 ## writeRaster(get_raster("Porosity"),
@@ -93,8 +93,8 @@ writeRaster(get_raster("Silt"),
 #           "Gravel", "Sand", "Silt", "D50", 
 #           "Porosity", "Permeability", "OMC") 
 
-vars <- c("Slope", "TPI", "TRI", "Roughness", "Hard",       # List variable names used in file names
-          "Gravel", "Sand", "Silt", "D50") 
+vars <- c("Slope", "TPI", "TRI", "Roughness", "Rock",       # List variable names used in file names
+          "Gravel", "Sand", "Silt", "Dxbar") 
  
 walk(vars, ~{
   system(str_glue("ncks -A ./Objects/{.x}.nc ./Output/Greenland_and_barents_sea_shelf_sediments.nc")) # In turn bind a variable to the main file
