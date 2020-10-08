@@ -14,28 +14,28 @@ land <- readRDS("./Objects/Land.rds") %>% st_transform(crs = 3035)            # 
 proj <- rgdal::make_EPSG() %>%                                                # Get proj4 strings from epsg codes
   filter(code == crs)
 
-raster <- stack(raster("./Output/Greenland_and_barents_sea_shelf_sediments.nc", var = "Hard"),
+raster <- stack(#raster("./Output/Greenland_and_barents_sea_shelf_sediments.nc", var = "Hard"),
                 raster("./Output/Greenland_and_barents_sea_shelf_sediments.nc", var = "Gravel"),
                 raster("./Output/Greenland_and_barents_sea_shelf_sediments.nc", var = "Sand"),
                 raster("./Output/Greenland_and_barents_sea_shelf_sediments.nc", var = "Silt"))%>% 
   projectRaster(crs = proj$prj4) %>% 
   as.data.frame(xy = T) %>% 
   drop_na() %>% 
-  rename(Hard = "Areas.of.solid.substrate",      
-         Gravel = "Percent.bottom.cover.as.gravel",
-         Sand = "Percent.bottom.cover.as.sand",
-         Silt = "Percent.bottom.cover.as.silt") %>% 
-  pivot_longer(Hard:Silt, names_to = "Bottom", values_to = "Cover") 
+  rename(#Hard = "Areas.of.solid.substrate",      
+         Gravel = "Percent.sediment.composition.gravel",
+         Sand = "Percent.sediment.composition.sand",
+         Silt = "Percent.sediment.composition.as.silt") %>% 
+  pivot_longer(Gravel:Silt, names_to = "Bottom", values_to = "Share") 
 
 #### Plot ####
 
 ggplot() + 
   ggpubr::background_image(png::readPNG("./Figures/background.png")) +
   geom_path(data = marks, aes(x=x, y=y, group = graticule), colour = "grey", size = 0.2) + # Add Graticules 
-  geom_raster(data = raster, aes(x=x, y=y, fill = Cover)) +                                # Add rasters
-  viridis::scale_fill_viridis(name = "Bottom cover (%)", option = "E") +                   # Specify fill
+  geom_raster(data = raster, aes(x=x, y=y, fill = Share)) +                                # Add rasters
+  viridis::scale_fill_viridis(name = "Sediment composition by weight (%)", option = "E") + # Specify fill
   sediment_aes +                                                                           # Use consistent aesthetics
-  facet_wrap(vars(Bottom)) +                                                               # Facet by sediment fraction
+  facet_wrap(vars(Bottom), ncol = 1) +                                                     # Facet by sediment fraction
   NULL
 
-ggsave("./Figures/Figure 4-1.png", width = 13, height = 8, units = "cm", dpi = 1500)
+ggsave("./Figures/Figure 4-1.png", width = 7, height = 11, units = "cm", dpi = 1500)
