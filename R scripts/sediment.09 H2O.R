@@ -142,33 +142,73 @@ Fraction_error <- function(Confusion, coding, Fraction) {
                             Error = mean(Fraction_error$Match))
     } # Extract the sediment fraction error from a confusion matrix
 
-Fraction_error_plot <- function(data) {
-    ggplot(data, aes(x= Actual, y = Predicted, fill = count +1)) + 
-    geom_raster() +
-    scale_fill_viridis(option = "inferno", name = "Frequency", trans = "log") +
-    labs(subtitle = str_glue("{data$Fraction[1]} ({round(data$Error[1]*100, digits = 1)} %)"), x = NULL) +
-    theme_minimal() +
-    theme(text = element_text(family = "Avenir", size = 10)) +
-    annotate("segment", x = 0.5, y = 0.5, xend = length(unique(data$Predicted)) + 0.5, 
-             yend = length(unique(data$Predicted)) + 0.5, colour = "white") +
-    NULL
-}                   # Create a plot of fit for a sediment fraction
+# Fraction_error_plot <- function(data) {
+#     ggplot(data, aes(x= Actual, y = Predicted, fill = count +1)) + 
+#     geom_raster() +
+#     scale_fill_viridis(option = "inferno", name = "Frequency", trans = "log") +
+#     labs(subtitle = str_glue("{data$Fraction[1]} ({round(data$Error[1]*100, digits = 1)} %)"), x = NULL) +
+#     theme_minimal() +
+#     theme(text = element_text(family = "Avenir", size = 10)) +
+#     annotate("segment", x = 0.5, y = 0.5, xend = length(unique(data$Predicted)) + 0.5, 
+#              yend = length(unique(data$Predicted)) + 0.5, colour = "white") +
+#     NULL
+# }                   # Create a plot of fit for a sediment fraction
   
 errors <- map2_dfr(list(Hard_levels, Grav_levels, Sand_levels, Silt_levels),# For each set of levels contributing to a fraction
                c("Hard", "Gravel", "Sand", "Silt"), Fraction_error,         # Calculate the condensed error
                Confusion = h2o.confusionMatrix(RF, valid = TRUE))           # From the random forest output
 
-plots <- split(errors, f = list(errors$Fraction)) %>%                       # Split errors by sediment fraction
-  map(Fraction_error_plot)                                                  # Create a plot for each fraction
+# plots <- split(errors, f = list(errors$Fraction)) %>%                       # Split errors by sediment fraction
+#   map(Fraction_error_plot)                                                  # Create a plot for each fraction
+# 
+# (plots[["Hard"]] + plots[["Gravel"]]) / 
+# (plots[["Sand"]] + plots[["Silt"]]) +                          # Bind in a facet 
+#   theme(axis.text.x = element_text(angle = 90),
+#         legend.position = "none", 
+#         plot.subtitle = element_text(size = 8))
+# 
+# ggsave("./Figures/Figure 3 fit.png", plot = last_plot(), scale = 1, width = 17, height = 12, units = "cm", dpi = 1500)
 
-Imp_plot + ((plots[["Hard"]] + plots[["Gravel"]]) / 
-            (plots[["Sand"]] + plots[["Silt"]])) +                          # Bind in a facet 
-  plot_layout(widths = c(0.3, 1)) &
-  theme(axis.text.x = element_text(angle = 90),
-        legend.position = "none", 
-        plot.subtitle = element_text(size = 8))
+new <- group_by(errors, Actual, Fraction) %>% 
+  transmute(Predicted, Percent = count/sum(count), Error) %>%
+  ungroup() %>% 
+  mutate(Fraction = ifelse(Fraction == "Hard", "Rock", Fraction)) %>% 
+  mutate(Fraction = str_glue("{Fraction} ({round(Error*100, digits = 1)}%)"),
+         Actual = paste0(Actual, "%"),
+         Predicted = paste0(Predicted, "%")) %>%
+  mutate(Actual = ifelse(Actual == "Soft%", "False", ifelse(Actual == "Hard%", "True", Actual)),
+         Predicted = ifelse(Predicted == "Soft%", "False", ifelse(Predicted == "Hard%", "True", Predicted))) 
+  
 
-ggsave("./Figures/Figure 3 fit.png", plot = last_plot(), scale = 1, width = 17, height = 12, units = "cm", dpi = 1500)
+new$Predicted <- factor(new$Predicted, levels = c("True", "False", "0%", "<2%", "<9%", "<10%", "2-30%", 
+                                                  "<22.5%", ">22.5%", "30-80%",  "<45%", ">45%", "<50%", ">50%",  
+                                                  ">76%",  "<80%", ">80%", ">90%"),
+                        labels = c("True", "False", "0%", "<2%", "<9%", "<10%", "2-30%", 
+                                   "<22.5%", ">22.5%", "30-80%",  "<45%", ">45%", "<50%", ">50%",  
+                                   ">76%",  "<80%", ">80%", ">90%"))
+
+new$Actual <- factor(new$Actual, levels = c("True", "False", "0%", "<2%", "<9%", "<10%", "2-30%", 
+                                            "<22.5%", ">22.5%", "30-80%",  "<45%", ">45%", "<50%", ">50%", 
+                                            ">76%",  "<80%", ">80%", ">90%"),
+                        labels = c("True", "False", "0%", "<2%", "<9%", "<10%", "2-30%", 
+                                   "<22.5%", ">22.5%", "30-80%",  "<45%", ">45%", "<50%", ">50%",  
+                                   ">76%",  "<80%", ">80%", ">90%"))
+
+ggplot() +
+  geom_raster(data = new, aes(y = Actual, x = Predicted, fill = Percent * 100)) +
+  viridis::scale_fill_viridis(name = "Percent of predictions", option = "E",
+                              trans = "sqrt", breaks = c(0, 25, 50, 75), labels = c("0%", "25%", "50%", "75%")) +               # Specify fill
+  facet_wrap(vars(Fraction), nrow = 2, scales = "free") +
+  theme(panel.background = element_rect(fill = NULL),
+        text = element_text(family = "Avenir", size = 10),
+        axis.text.x = element_text(angle = 90),
+        legend.position = "bottom") +
+  guides(fill = guide_colourbar(barheight = 0.5, barwidth = 15, title.vjust = 1)) +
+  scale_x_discrete(expand = expansion(mult = c(0, 0))) + # remove white space around rasters
+  scale_y_discrete(expand = expansion(mult = c(0, 0))) +
+  NULL
+
+ggsave("./Figures/Figure 3 fit.png", plot = last_plot(), scale = 1, width = 14, height = 13, units = "cm", dpi = 1500)
 
 #### Full sediment map ####
 
