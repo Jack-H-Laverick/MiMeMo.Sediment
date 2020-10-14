@@ -38,6 +38,8 @@ S <- ggplot() +
                               breaks = c(0.0001, 0.001, 0.01, 0.1, 3)) +       # Specify fill
   sediment_aes +                                                               # Use consistent aesthetics
   facet_wrap(vars(Var)) +                                          # Facet by month
+  guides(fill = guide_colourbar(barheight = 0.5, barwidth = 15, title.vjust = 1, 
+                                title.hjust = 0.5, title.position = "top"))+
   NULL
 
 #### Disturbance ####
@@ -46,7 +48,7 @@ disturbance <- raster("./Output/Greenland_and_barents_sea_seasonal_disturbance.n
   projectRaster(crs = proj$prj4) %>% 
   as.data.frame(xy = T) %>% 
   drop_na() %>% 
-  mutate(Var = "Natural Disturbance")
+  mutate(Var = "Natural disturbance")
 names(disturbance) <- c("x", "y", "Disturbance", "Var")
   
 #ggplot() +                                                                # Where could we limit the colour scale to make it more readable?
@@ -67,9 +69,12 @@ D <- ggplot() +
                                        1)}) +                      # Limit max colour fill
   sediment_aes +                                                                           # Use consistent aesthetics
   facet_wrap(vars(Var)) +                                          # Facet by month
+  guides(fill = guide_colourbar(barheight = 0.5, barwidth = 15, title.vjust = 1, 
+                                title.hjust = 0.5, title.position = "top"))+
+  
   NULL
 
 
-combined <- S/D
+S/D
 
-ggsave("./Figures/Figure 7 movement.png", width = 13, height = 14, units = "cm", dpi = 1500)
+ggsave("./Figures/Figure 8 movement.png", width = 13, height = 14, units = "cm", dpi = 1500)
