@@ -5,7 +5,8 @@
 
 rm(list=ls())
 
-library("tidyverse")
+library(tidyverse)
+library(betareg)
 
 csv <- data.table::fread("./Output/Greenland_and_barents_sea_shelf_sediments.csv") # Reimport output file
 
@@ -29,7 +30,10 @@ fit <- data.frame(Silt = seq(0,1,0.01)) %>%
 ggplot(relationship, aes(x=Silt, y=N_org)) +                                       # Plot
   geom_point() +
   geom_line(data = fit) +
-  theme_minimal()
+  theme_minimal() +
+  labs(x = "Proportion mud", y = "Organic nitrogen (%)")
+
+ggsave("./Figures/OMC fit.png")
 
 #### Predict for the sediment map ####
 
