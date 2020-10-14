@@ -82,19 +82,17 @@ writeRaster(get_raster("Silt"),
 ##             varname= "Permeability", longname = "Permeability", 
 ##             varunit = "?", xname = "Longitude", yname = "Latitude")
 
-## writeRaster(get_raster("OMC"),
-##             "./Objects/OMC.nc", overwrite = TRUE, format = "CDF", 
-##             varname= "OMC", longname = "Organic matter content", 
-##             varunit = "?", xname = "Longitude", yname = "Latitude")
+ writeRaster(get_raster("OMC"),
+             "./Objects/OMC.nc", overwrite = TRUE, format = "CDF", 
+             varname= "OMC", longname = "Percent of sediment as organic Nitrogen by weight", 
+             varunit = "%", xname = "Longitude", yname = "Latitude")
 
 #### Combine files ####
 
-# vars <- c("Slope", "TPI", "TRI", "Roughness", "Hard",     # List variable names used in file names
-#           "Gravel", "Sand", "Silt", "D50", 
-#           "Porosity", "Permeability", "OMC") 
+# vars <- c("Porosity", "Permeability") 
 
 vars <- c("Slope", "TPI", "TRI", "Roughness", "Rock",       # List variable names used in file names
-          "Gravel", "Sand", "Silt", "Dxbar") 
+          "Gravel", "Sand", "Silt", "Dxbar", "OMC") 
  
 walk(vars, ~{
   system(str_glue("ncks -A ./Objects/{.x}.nc ./Output/Greenland_and_barents_sea_shelf_sediments.nc")) # In turn bind a variable to the main file
@@ -106,4 +104,3 @@ unlink(list.files(path = "./Output", pattern = ".tmp",      # Delete temporary f
 
 ### system("ncks -A ./Objects/Porosity.nc ./Output/Sediment map.nc")
 ### system("ncks -A ./Objects/Permeability.nc ./Output/Sediment map.nc")
-### system("ncks -A ./Objects/OMC.nc ./Output/Sediment map.nc")
