@@ -31,4 +31,4 @@ ggplot(raster) +
   facet_wrap(vars(label), labeller = label_parsed) +
   NULL
 
-ggsave("./Figures/Figure 4-2.png", width = 13, height = 7, units = "cm", dpi = 1500)
+ggsave("./Figures/Figure 5.png", width = 13, height = 7, units = "cm", dpi = 1500)
