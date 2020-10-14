@@ -24,7 +24,7 @@ raster <- stack(#raster("./Output/Greenland_and_barents_sea_shelf_sediments.nc",
   rename(#Hard = "Areas.of.solid.substrate",      
          Gravel = "Percent.sediment.composition.gravel",
          Sand = "Percent.sediment.composition.sand",
-         Silt = "Percent.sediment.composition.as.silt") %>% 
+         Silt = "Percent.sediment.composition.silt") %>% 
   pivot_longer(Gravel:Silt, names_to = "Bottom", values_to = "Share") 
 
 #### Plot ####
@@ -36,6 +36,8 @@ ggplot() +
   viridis::scale_fill_viridis(name = "Sediment composition by weight (%)", option = "E") + # Specify fill
   sediment_aes +                                                                           # Use consistent aesthetics
   facet_wrap(vars(Bottom), ncol = 1) +                                                     # Facet by sediment fraction
-  NULL
+  guides(fill = guide_colourbar(barheight = 0.5, barwidth = 15, title.vjust = 1, 
+                                title.hjust = 0.5, title.position = "top"))+
+NULL
 
-ggsave("./Figures/Figure 4-1.png", width = 7, height = 11, units = "cm", dpi = 1500)
+ggsave("./Figures/Figure 4.png", width = 9, height = 14, units = "cm", dpi = 1500)
