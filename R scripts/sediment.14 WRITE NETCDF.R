@@ -72,15 +72,15 @@ writeRaster(get_raster("Silt"),
              varname= "Dxbar", longname = "Mean grain size", varunit = "mm",
              xname = "Longitude", yname = "Latitude")
 
-## writeRaster(get_raster("Porosity"),
-##             "./Objects/Porosity.nc", overwrite = TRUE, format = "CDF", 
-##             varname= "Porosity", longname = "Porosity", 
-##             varunit = "?", xname = "Longitude", yname = "Latitude")
+ writeRaster(get_raster("Porosity"),
+             "./Objects/Porosity.nc", overwrite = TRUE, format = "CDF", 
+             varname= "Porosity", longname = "Porosity", 
+             varunit = "%", xname = "Longitude", yname = "Latitude")
 
-## writeRaster(get_raster("Permeability"),
-##             "./Objects/ND.nc", overwrite = TRUE, format = "CDF", 
-##             varname= "Permeability", longname = "Permeability", 
-##             varunit = "?", xname = "Longitude", yname = "Latitude")
+ writeRaster(get_raster("Permeability"),
+             "./Objects/Permeability.nc", overwrite = TRUE, format = "CDF", 
+             varname= "Permeability", longname = "Permeability", 
+             varunit = "m^2", xname = "Longitude", yname = "Latitude")
 
  writeRaster(get_raster("OMC"),
              "./Objects/OMC.nc", overwrite = TRUE, format = "CDF", 
@@ -89,10 +89,9 @@ writeRaster(get_raster("Silt"),
 
 #### Combine files ####
 
-# vars <- c("Porosity", "Permeability") 
-
 vars <- c("Slope", "TPI", "TRI", "Roughness", "Rock",       # List variable names used in file names
-          "Gravel", "Sand", "Silt", "Dxbar", "OMC") 
+          "Gravel", "Sand", "Silt", "Dxbar", "OMC",
+          "Porosity", "Permeability") 
  
 walk(vars, ~{
   system(str_glue("ncks -A ./Objects/{.x}.nc ./Output/Greenland_and_barents_sea_shelf_sediments.nc")) # In turn bind a variable to the main file
@@ -101,6 +100,3 @@ walk(vars, ~{
 unlink(str_glue("./Objects/{vars}.nc"))                     # Delete the redundant files
 unlink(list.files(path = "./Output", pattern = ".tmp",      # Delete temporary files
                   full.names = TRUE))
-
-### system("ncks -A ./Objects/Porosity.nc ./Output/Sediment map.nc")
-### system("ncks -A ./Objects/Permeability.nc ./Output/Sediment map.nc")
