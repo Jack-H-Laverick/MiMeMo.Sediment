@@ -3,7 +3,7 @@
 
 rm(list=ls())                                                               # Wipe the brain
 
-packages <- c("MiMeMo.tools", "tidyverse", "tictoc", "furrr", "sf", "data.table", "raster")  # List packages
+packages <- c("MiMeMo.tools", "tictoc", "furrr", "sf", "data.table", "raster")  # List packages
 lapply(packages, library, character.only = TRUE)                            # Load packages
 source("./R scripts/@_Set up file.R")
 
@@ -45,7 +45,7 @@ stress <- map_df(c(0.02, 0.0103125, 0.0003174), ~{                 # Calculate d
   mutate(movement = shields_number > shields_critical,            # When is dimensionless shear stress larger than shear stress required to initiate motion
          month = data$month,
          D50 = .x) }) %>% 
-  group_by(month, D50) %>% 
+  group_by(month, D50) %>%  
   summarise(stress = mean(movement)) %>%                          # Calculate the proportion of time water moves fast enough to initiate movement
   ungroup() %>% 
   pivot_wider(names_from = c(month, D50), values_from = stress)
@@ -136,4 +136,4 @@ writeRaster(layers,
             "./Output/Greenland_and_barents_sea_seasonal_disturbance.nc", overwrite = TRUE, format = "CDF", 
              varname= "Natural_disturbance", 
              longname = "Time shields value exceeds threshold for the initiation of motion, weighted by sediment fractions", 
-             varunit = "%", xname = "Longitude", yname = "Latitude", zname = "Month")
+             varunit = "Proportion", xname = "Longitude", yname = "Latitude", zname = "Month")
