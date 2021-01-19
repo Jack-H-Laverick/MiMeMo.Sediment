@@ -26,7 +26,7 @@ Por <- ggplot() +
   ggpubr::background_image(png::readPNG("./Figures/background.png")) +
   geom_path(data = marks, aes(x=x, y=y, group = graticule), colour = "grey", size = 0.2) + # Add Graticules 
   geom_raster(data = Porosity, aes(x=x, y=y, fill = Porosity)) +               # Add rasters
-  viridis::scale_fill_viridis(name = ("(%)"), option = "E") +        # Specify fill
+  viridis::scale_fill_viridis(name = (""), option = "E") +        # Specify fill
   sediment_aes +                                                               # Use consistent aesthetics
   facet_wrap(vars(Var)) +                                          # Facet by month
  # guides(fill = guide_colourbar(barheight = 0.5, barwidth = 15, title.vjust = 1, 
