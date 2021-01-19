@@ -81,6 +81,8 @@ Imp_plot <- ggplot() +
         text = element_text(family = "Avenir", size = 10)) +
   NULL
 
+ggsave("./Figures/Importance.png", plot = Imp_plot)
+
 #### Condense sediment classes ####
 
 Hard_levels <- list(Hard = c(1, 175, 180, 185, 300), 
@@ -142,32 +144,9 @@ Fraction_error <- function(Confusion, coding, Fraction) {
                             Error = mean(Fraction_error$Match))
     } # Extract the sediment fraction error from a confusion matrix
 
-# Fraction_error_plot <- function(data) {
-#     ggplot(data, aes(x= Actual, y = Predicted, fill = count +1)) + 
-#     geom_raster() +
-#     scale_fill_viridis(option = "inferno", name = "Frequency", trans = "log") +
-#     labs(subtitle = str_glue("{data$Fraction[1]} ({round(data$Error[1]*100, digits = 1)} %)"), x = NULL) +
-#     theme_minimal() +
-#     theme(text = element_text(family = "Avenir", size = 10)) +
-#     annotate("segment", x = 0.5, y = 0.5, xend = length(unique(data$Predicted)) + 0.5, 
-#              yend = length(unique(data$Predicted)) + 0.5, colour = "white") +
-#     NULL
-# }                   # Create a plot of fit for a sediment fraction
-  
 errors <- map2_dfr(list(Hard_levels, Grav_levels, Sand_levels, Silt_levels),# For each set of levels contributing to a fraction
                c("Hard", "Gravel", "Sand", "Silt"), Fraction_error,         # Calculate the condensed error
                Confusion = h2o.confusionMatrix(RF, valid = TRUE))           # From the random forest output
-
-# plots <- split(errors, f = list(errors$Fraction)) %>%                       # Split errors by sediment fraction
-#   map(Fraction_error_plot)                                                  # Create a plot for each fraction
-# 
-# (plots[["Hard"]] + plots[["Gravel"]]) / 
-# (plots[["Sand"]] + plots[["Silt"]]) +                          # Bind in a facet 
-#   theme(axis.text.x = element_text(angle = 90),
-#         legend.position = "none", 
-#         plot.subtitle = element_text(size = 8))
-# 
-# ggsave("./Figures/Figure 3 fit.png", plot = last_plot(), scale = 1, width = 17, height = 12, units = "cm", dpi = 1500)
 
 new <- group_by(errors, Actual, Fraction) %>% 
   transmute(Predicted, Percent = count/sum(count), Error) %>%
