@@ -10,7 +10,7 @@ graticule <- function(type, value, crs) {
   
   line <- sf::st_as_sf(points, coords = c("Longitude", "Latitude"), crs = 4326) %>% 
     sf::st_transform(crs = crs) %>% 
-    nemomedusR::sfc_as_cols() %>% 
+    MiMeMo.tools::sfc_as_cols() %>% 
     sf::st_drop_geometry()
   
   return(line)
