@@ -68,15 +68,15 @@ calculate_stress <- function (data, depth, percentile = 0.95) {
 stress <- bedshear::shear_stress(
   bathymetry = depth,                                            # Depth to sea floor
   D50 = 0.02,                                                    # Nominal median grain size
-  tidal_velocity = data$uvSpeed,                            # Water movements
+  tidal_velocity = data$uvSpeed,                                 # Water movements
   tidal_direction = data$uvDirection,
   wave_height = data$swh,
   wave_period = data$mwp,
   wave_direction = data$mwd/10,
   switch = 0) %>%
-  dplyr::select(shear_mean)                                     # Keep only mean bed shear stress
+  dplyr::select(shear_mean)                                      # Keep only mean bed shear stress
 
-stress <- quantile(stress$shear_mean, percentile)                 # Calculate the percentile over the time series
+stress <- quantile(stress$shear_mean, percentile)                # Calculate the percentile over the time series
       }
 
   return(stress)  
