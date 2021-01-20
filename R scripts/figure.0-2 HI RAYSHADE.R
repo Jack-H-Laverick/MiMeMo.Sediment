@@ -58,7 +58,7 @@ plot_3d(shaded, mat, asp = (raster2@extent@xmax - raster2@extent@xmin) /        
 
 
 tic()
-render_highquality(parallel = TRUE, #filename = "./Figures/rayshade_hi.png",
+render_highquality(parallel = TRUE, #filename = "./Figures/rayshade-hi.png",
                    scene_elements = bind_rows(rayrender::text3d(label = "Greenland Sea", text_height = (425*5), 
                                                 material = rayrender::metal(),
                                                 y = (800*5), x = (-2000*5), z = (-1500*5), angle = c(60,0,0)),
