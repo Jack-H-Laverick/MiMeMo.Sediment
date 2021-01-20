@@ -31,7 +31,7 @@ ggplot(relationship, aes(x=Silt, y=N_org)) +                                    
   geom_point() +
   geom_line(data = fit) +
   theme_minimal() +
-  labs(x = "Proportion mud", y = "Organic nitrogen (%)")
+  labs(x = "Proportion silt or finer", y = "Organic nitrogen (%)")
 
 ggsave("./Figures/OMC fit.png")
 
