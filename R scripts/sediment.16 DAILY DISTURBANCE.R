@@ -14,18 +14,16 @@ depths <- map(pairs_chunked, ~{ as.list(.[,"Depth"])})
 
 #### Get variable to indicate day ####
 
-raw <- ncdf4::nc_open("./Objects/tides.nc")                                         # Open file containing all the data
-time <- raw$dim$time$len                                                     # Pull the length of the time dimension
-ncdf4::nc_close(raw)                                                                # Close file
+raw <- ncdf4::nc_open("./Objects/tides.nc")                                 # Open file containing all the data
+time <- raw$dim$time$len                                                    # Pull the length of the time dimension
+ncdf4::nc_close(raw)                                                        # Close file
 
-tide_step <- seq(ISOdate(2003, 02, 1, 0), by = "2 hours", length.out = time) %>%    # Calculate time steps for the dataset
+tide_step <- seq(ISOdate(2003, 02, 1, 0), by = "2 hours", length.out = time) %>%  # Calculate time steps for the dataset
 format("%Y%m%d")
 
 #### function ####
 
-calculate_disturbance <- function (data, depth) {
-  
-  D50s <- c(2, 1.03125, 0.03174)                                        # mm min-gravel size, mid-sand, max-silt
+calculate_disturbance <- function (data, depth, D50s) {
   
   if(anyNA(data)) { 
   
@@ -67,13 +65,17 @@ stress <- map_df(D50s, ~{                 # Calculate disturbance for each mean 
 
 #### looping over pixels ####
 
+mid_bin <- c(2, 1.03125, 0.03174)                  # D50s as the mean of sediment ranges
+mid_log_bin <- c(11.31371, 0.3535534, 0.007826238) # D50s calculating mean on a log scale, it's not a linear system 
+
 tic()
 
 stress <- future_map(0:(length(pairs_chunked)-1), ~ {
 
   map2(readRDS(glue::glue("./Objects/stress_input/{.x}.rds")) %>% map(cbind, tide_step),
        depths[[(.x+1)]],
-       calculate_disturbance) %>%
+       calculate_disturbance,
+       D50s = mid_log_bin) %>%                     # mm D50s to predict for movement
   data.table::rbindlist() %>%
   feather::write_feather(glue::glue("./Objects/disturbance_input/daily_{.x+1}.feather"))
   
