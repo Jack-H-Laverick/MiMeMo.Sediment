@@ -1,5 +1,6 @@
 
 ## Run batches of R scripts. Handy if you want scripts to run after another finishes while you're away from the machine
+
 library(tidyverse)
 
 scripts <- c(                                            # List scripts in the order you want to run them
@@ -21,20 +22,7 @@ scripts <- c(                                            # List scripts in the o
   # "./R scripts/sediment.15 SEASONAL STRESS.R",
   "./R scripts/sediment.16 DAILY DISTURBANCE.R",
   "./R scripts/sediment.17 RASTERISE DISTURBANCE.R"
-
+  #"./R scripts/sediment.18 SEASONLA DISTURBANCE.R",
+  #"./R scripts/sediment.19 ZONAL SUMMARIES.R"
 ) %>% 
   map(MiMeMo.tools::execute)
-
-#### Plot run times ####
-
-timings <- tictoc::tic.log(format = F) %>%                                                     # Get the log of timings
-  lapply(function(x) data.frame("Script" = x$msg, Minutes = (x$toc - x$tic)/60)) %>%   # Get a dataframe of scripts and runtimes in minutes
-  bind_rows() %>%                                                                      # Get a single dataframe
-  separate(Script, into = c(NA, "Script"), sep = "/R scripts/") %>% 
-  separate(Script, into = c("Type", NA, NA), sep = "[.]", remove = F) %>% 
-  mutate(Script = factor(Script, levels = Script[order(rownames(.), decreasing = T)])) # Order the scripts
-saveRDS(timings, "./Objects/Run time.rds")
-
-source("./R scripts/@_Script runtimes.R")                                              # Plot run times
-
-   
