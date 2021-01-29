@@ -38,3 +38,4 @@ disturbance by month.
 | 16 DAILY DISTURBANCE     | Calculate whether pixels are physically disturbed per day.                   |
 | 17 RASTERISE DISTURBANCE | Collect distributed estimates of disturbance into a NetCDF file.             |
 | 18 SEASONAL DISTURBANCE  | Calculate mean proportion of days in a month pixels are disturbed, by month. |
+| 19 ZONAL SUMMARIES       | Calculate summary statistics for each region to report in the manuscript.    |
