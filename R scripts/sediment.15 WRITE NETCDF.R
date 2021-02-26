@@ -9,15 +9,15 @@ Packages <- c("tidyverse", "ncdf4", "stars", "raster", "tictoc") # List packages
 lapply(Packages, library, character.only = TRUE)                 # Load packages
 
 data <- readRDS("./Objects/Everything.rds") %>% 
-  st_drop_geometry()
+  mutate(Stress95 = as.numeric(Stress95)) %>% 
+  as.data.frame() %>%
+  dplyr::select(-geometry)
 
 get_raster <- function(var) {
   
   raster <- data[,c("Longitude", "Latitude", var)] %>% 
   rasterFromXYZ()
   
-  #rasterFromXYZ(dplyr::select(data, Latitude, Longitude, var))
-
   }
 
 #### Write one file per variable ####
@@ -49,7 +49,7 @@ writeRaster(get_raster("Roughness"),
 
 writeRaster(get_raster("Rock"),
             "./Objects/Rock.nc", overwrite = TRUE, format = "CDF", 
-            varname= "Rock", longname = "Areas of solid substrate", varunit = "Logical, 1 = True",
+            varname= "Rock", longname = "Areas of solid substrate", varunit = "%",
             xname = "Longitude", yname = "Latitude")
 
 writeRaster(get_raster("Gravel"),
@@ -82,20 +82,25 @@ writeRaster(get_raster("Silt"),
              varname= "Permeability", longname = "Permeability", 
              varunit = "m^2", xname = "Longitude", yname = "Latitude")
 
- writeRaster(get_raster("OMC"),
-             "./Objects/OMC.nc", overwrite = TRUE, format = "CDF", 
-             varname= "OMC", longname = "Percent of sediment as organic Nitrogen by weight", 
+ writeRaster(get_raster("TON"),
+             "./Objects/TON.nc", overwrite = TRUE, format = "CDF", 
+             varname= "TON", longname = "Percent of sediment as organic Nitrogen by weight", 
              varunit = "%", xname = "Longitude", yname = "Latitude")
 
+ writeRaster(get_raster("TOC"),
+             "./Objects/TOC.nc", overwrite = TRUE, format = "CDF", 
+             varname= "TOC", longname = "Percent of sediment as organic Carbon by weight", 
+             varunit = "%", xname = "Longitude", yname = "Latitude")
+ 
 #### Combine files ####
 
 vars <- c("Slope", "TPI", "TRI", "Roughness", "Rock",       # List variable names used in file names
-          "Gravel", "Sand", "Silt", "Dxbar", "OMC",
-          "Porosity", "Permeability") 
+          "Gravel", "Sand", "Silt", "Dxbar", "TON",
+          "TOC", "Porosity", "Permeability") 
  
 walk(vars, ~{
   system(str_glue("ncks -A ./Objects/{.x}.nc ./Output/Greenland_and_barents_sea_shelf_sediments.nc")) # In turn bind a variable to the main file
-})                                          # Bind together all the netcdf files
+  usethis::ui_done("added {.x}")})                          # Bind together all the netcdf files
 
 unlink(str_glue("./Objects/{vars}.nc"))                     # Delete the redundant files
 unlink(list.files(path = "./Output", pattern = ".tmp",      # Delete temporary files
