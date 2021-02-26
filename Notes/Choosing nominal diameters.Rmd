@@ -1,0 +1,120 @@
+---
+title: "Choosing Representative Diameters for Sediment Fractions"
+author: "Jack H Laverick"
+date: "22/01/2021"
+output: html_document
+---
+
+<style>
+.title, .author, .date {text-align: center;}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align = "center", out.width = "100%", fig.asp = .3)
+
+library(tidyverse)
+```
+
+## Background
+
+According to the Wentworth scale gravels have a diameter of 2 – 64 mm; sands have a diameter of 62.5 μm – 2 mm;	silts have a diameter of 3.9 – 62.5 μm; clays have a diameter of 0.98 – 3.9 μm. The Norwegian Geological Survey (NGU) treats silt and clay as a combined class, which can be referred to as mud by some sources. This means for our purposes the range of diameters for silts becomes 3.9 - 0.98 μm.
+<br>
+Typically distributions of grain sizes are summarised to a median value (D50). As we do not have information on the distribution of grain sizes we can only assign a single nominal value to each of the three classes. In practice this makes median values unworkable. Everything will be labeled as sand as the intermediate class, provided silts and gravels both make less than 50% of observations. For this reason we chose to work with the mean diameters.
+<br>
+
+## The problem
+
+Working with mean diameters raises it's own problems. We are able to introduce more variation into our summaries of sediments, however the values are bounded by the nominal value used for silt and gravel. <span style="color: #fcba03; font-weight: bold;"> nb this is also true for using the median value.</span> More importantly, larger values have undue influences over means. This means large diameter gravels orders of magnitude larger than silts skew the estimate to larger sediment sizes. This is probably why geologists use the median in the first place. The problem can be seen below, when all 3 sediment fractions are equally common by weight it feels wrong to suggest the average grain size is gravel.
+
+```{r mean}
+
+bounds <- data.frame(Fraction = c("gravel", "sand", "silt"), 
+                     Upper = c(64, 2, 0.0625),
+                     Lower = c(2, 0.0625, 0.00098)) %>% 
+  mutate(Mid = (Upper + Lower)/2)
+
+ggplot(bounds) +
+  geom_rect(aes(ymin = 0.5, ymax = 1.5, xmin = Lower, xmax = Upper, fill = Fraction)) +
+  geom_point(aes(y = 1, x = Mid)) +
+  geom_point(aes(y = 1, x = mean(Mid)), shape = 21, fill = NA, size = 3, stroke = 2) +
+  theme_minimal() +
+  scale_fill_manual(values = c("#75716d", "#fcba03", "#fc8403")) +
+  labs(x = "Diameter (mm)", y = NULL,
+       caption = "The ring indicates the mean of the midpoints. Black dots are the midpoints") +
+  theme(axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(), 
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "top") +
+  NULL
+
+```
+
+<br>
+My proposal is to take the means of diameters on the log scale. Grain size classes aren't defined linearly, and this serves to pull things back more centrally
+
+```{r log}
+bounds <- data.frame(Fraction = c("gravel", "sand", "silt"), 
+                     Upper = c(64, 2, 0.0625),
+                     Lower = c(2, 0.0625, 0.00098)) %>% 
+  mutate(Mid = (Upper + Lower)/2)
+
+ggplot(bounds) +
+  geom_rect(aes(ymin = 0.5, ymax = 1.5, xmin = Lower, xmax = Upper, fill = Fraction)) +
+  geom_point(aes(y = 1.25, x = Mid)) +
+  geom_point(aes(y = 1.25, x = mean(Mid)), shape = 21, fill = NA, size = 3, stroke = 2) +
+  geom_point(aes(y = 0.75, x = 10^(mean(log10(Mid)))), shape = 21, colour = "white", fill = NA, size = 3, stroke = 2) +
+  theme_minimal() +
+  scale_fill_manual(values = c("#75716d", "#fcba03", "#fc8403")) +
+  labs(x = "Diameter (mm)", y = NULL,
+       caption = "The white ring is the updated mean using a log transformation on the midpoints") +
+  theme(axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(), 
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "top") +
+  NULL
+```
+
+<br>
+My proposal is to take the means of diameters on the log scale. Grain size classes aren't defined linearly, and this serves to pull things back more centrally
+
+```{r midpoints}
+bounds <- data.frame(Fraction = c("gravel", "sand", "silt"), 
+                     Upper = c(64, 2, 0.0625),
+                     Lower = c(2, 0.0625, 0.00098)) %>% 
+  mutate(Mid = (Upper + Lower)/2,
+         Mid_log = 10^((log10(Upper) + log10(Lower))/2))
+
+ggplot(bounds) +
+  geom_rect(aes(ymin = 0.5, ymax = 1.5, xmin = Lower, xmax = Upper, fill = Fraction)) +
+  geom_point(aes(y = 1.25, x = Mid)) +
+  geom_point(aes(y = 0.75, x = 10^mean(log10(Mid_log))), shape = 21, colour = "steelblue4", fill = NA, size = 3, stroke = 2) +
+  geom_point(aes(y = 0.75, x = Mid_log), colour = "cyan") +
+  geom_point(aes(y = 1.25, x = mean(Mid)), shape = 21, fill = NA, size = 3, stroke = 2) +
+  geom_point(aes(y = 1, x = 10^(mean(log10(Mid)))), shape = 21, colour = "white", fill = NA, size = 3, stroke = 2) +
+  theme_minimal() +
+  scale_x_continuous(breaks = c(60, 6, 0.6, 0.06, 0.006)) +
+  scale_fill_manual(values = c("#75716d", "#fcba03", "#fc8403")) +
+  labs(x = "Diameter (mm)", y = NULL,
+       caption = "The blue points are the updated values using a log scale") +
+  theme(axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(), 
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "top") +
+  coord_trans(x="log10") +
+  NULL
+```
+
+<br>
+This reasoning also has a logical consequence for choosing nominal values for sediment classes. Initially I used the midpoint between the upper and lower bound of a sediment class. This is equivalent to taking a mean of diameters and so subject to the same problem above. It may make sense to take the mid-point of the sediment class on a log scale. The differences are shown below.
+
+## Conclusion
+
+Using the log-midpoints is currently the only way to get any disturbance to show in our model. Mean values are simply too large.
+Do we think this is defensible based on the logic above? We agreedthis makes sens.
