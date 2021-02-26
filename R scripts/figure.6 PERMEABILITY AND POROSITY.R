@@ -26,7 +26,7 @@ Por <- ggplot() +
   ggpubr::background_image(png::readPNG("./Figures/background.png")) +
   geom_path(data = marks, aes(x=x, y=y, group = graticule), colour = "grey", size = 0.2) + # Add Graticules 
   geom_raster(data = Porosity, aes(x=x, y=y, fill = Porosity)) +               # Add rasters
-  viridis::scale_fill_viridis(name = (""), option = "E") +        # Specify fill
+  viridis::scale_fill_viridis(name = NULL, option = "E") +        # Specify fill
   sediment_aes +                                                               # Use consistent aesthetics
   facet_wrap(vars(Var)) +                                          # Facet by month
  # guides(fill = guide_colourbar(barheight = 0.5, barwidth = 15, title.vjust = 1, 
@@ -47,7 +47,13 @@ ggplot() +
   ggpubr::background_image(png::readPNG("./Figures/background.png")) +
   geom_path(data = marks, aes(x=x, y=y, group = graticule), colour = "grey", size = 0.2) + # Add Graticules 
   geom_raster(data = Permeability, aes(x=x, y=y, fill = Permeability)) +  # Add rasters
-  viridis::scale_fill_viridis(name = expression("(" ~ m^2 ~ ")"), breaks = c(0.000000000000001,0.00000000000001,0.0000000000001,0.000000000001, 0.00000000001,0.0000000001,0.000000001), 
+  viridis::scale_fill_viridis(name = NULL, breaks = c(0.000000000000001,0.00000000000001,0.0000000000001,0.000000000001, 0.00000000001, 0.0000000001), 
+                              labels = c(expression("1" ~ e^-14),
+                                         expression("1" ~ e^-13),
+                                         expression("1" ~ e^-12),
+                                         expression("1" ~ e^-11),
+                                         expression("1" ~ e^-10),
+                                         expression("1" ~ e^-9 ~ m^2)),
                               option = "E", trans = "log")+
   sediment_aes +                                                                           # Use consistent aesthetics
   facet_wrap(vars(Var)) +                                          # Facet by month
@@ -58,4 +64,4 @@ ggplot() +
 
 Por/Per
 
-#ggsave("./Figures/Figure 6 porosity permeability.png", width = 13, height = 14, units = "cm", dpi = 1500)
+ggsave("./Figures/Figure 6 porosity permeability.png", width = 13, height = 14, units = "cm", dpi = 1500)
