@@ -3,10 +3,10 @@
 
 rm(list=ls())                                                               # Wipe the brain
 
-packages <- c("MiMeMo.tools", "raster", "tidyverse", "sf", "tictoc", "ncdf4", "furrr") # List packages
+packages <- c("MiMeMo.tools", "raster", "ncdf4", "furrr")                   # List packages
 lapply(packages, library, character.only = TRUE)                            # Load packages
 
-plan(multiprocess)
+plan(multisession)
 
 domains <- readRDS("./Objects/Domain.rds") %>%                              # Load SF polygons of the MiMeMo model domains
   st_transform(crs = 4326)                                                  # Transform to Lat/Lon to match other objects
@@ -29,18 +29,21 @@ GFW_grid <- st_make_grid(domains, what = "centers", cellsize = 0.1) %>%     # Ma
   st_sf(dummy = 1)                                                          # Convert to sf for joining
 
 
-targets1 <- st_join(st_transform(GFW_grid, crs = 3035), st_transform(dplyr::select(ECMWF_cells, wave_x, wave_y, Region), crs = 3035),
-                     join = nngeo::st_nn, k = 1, parallel = 8, maxdist = 100000)  # Find pixels from our sources as nearest neighbour to the new grid
+targets1 <- st_join(st_transform(GFW_grid, crs = 3035), 
+                   st_transform(dplyr::select(ECMWF_cells, wave_x, wave_y, Region), crs = 3035),
+                   join = nngeo::st_nn, k = 1, maxdist = 100000)  # Find pixels from our sources as nearest neighbour to the new grid
 
-targets2 <- st_join(st_transform(GFW_grid, crs = 3035), st_transform(dplyr::select(SINMOD_cells, tide_x, tide_y, Depth, Region), crs = 3035),
-                    join = nngeo::st_nn, k = 1, parallel = 8, maxdist = 100000)  # Find pixels from our sources as nearest neighbour to the new grid
+targets2 <- st_join(st_transform(GFW_grid, crs = 3035), 
+                    st_transform(dplyr::select(SINMOD_cells, tide_x, tide_y, Depth, Region), crs = 3035),
+                    join = nngeo::st_nn, k = 1, maxdist = 100000)  # Find pixels from our sources as nearest neighbour to the new grid
 
 aligned <- cbind(targets1, targets2[,c("tide_x", "tide_y", "Depth")]) %>%   # Combine the matched pixels from the two sources
   dplyr::select(-c(dummy, ..1)) %>% 
   st_transform(crs = 4326) %>%  
   sfc_as_cols(names = c("Longitude", "Latitude")) %>%                       # Get coordinates 
-  st_drop_geometry()                                                        # Drop SF formatting
-
+  st_drop_geometry() %>%                                                    # Drop SF formatting
+  drop_na(Region)                                                       ## Recent change, expected unmatched cells to be dropped.
+  
 tide_pixels <- dplyr::select(aligned, tide_x, tide_y) %>%                   # Which are the unique grid cells we need to calculate for?
   distinct()                                                                # We can save time indexing duplicate cells later
 
@@ -56,7 +59,7 @@ wave_pixels <- dplyr::select(aligned, wave_x, wave_y) %>%
 
 Water_pairs <- left_join(aligned, mutate(tide_pixels, tide_entry = row_number())) %>% # Add a time series ID to each source 
   left_join(mutate(wave_pixels, wave_entry = row_number())) %>%             # And bind to the alignment object
-  select(-ends_with(c("_y", "_x")))                                         # Drop redundant columns          
+  dplyr::select(-ends_with(c("_y", "_x")))                                  # Drop redundant columns          
 
 saveRDS(Water_pairs, "./Objects/Water look up table.rds")                   # Save
 
@@ -142,8 +145,9 @@ wave_ts <- function(swh, mwp, mwd) {
 }                                                                           # Expand time series and convert to zoo object
 
 Wave_list <- map2(wave_pixels$wave_x, wave_pixels$wave_y,                   # For each unique pixel
-                  ~ wave_ts(swh[.x,.y,], mwp[.x,.y,], mwd[.x,.y,]))         # Pull a time series of wave data
-
+                  ~ {wave_ts(swh[.x,.y,], mwp[.x,.y,], mwd[.x,.y,])})         # Pull a time series of wave data
+          
+                  
 #chunked <- split(Wave_list, (seq(length(Wave_list)) -1) %/% 7000) %>%       # Split into chunks of a specified length
 chunked <- split(Wave_list, (seq(length(Wave_list))) %/% 7000)        # Split into chunks of a specified length
 names(chunked) <- 1:length(chunked)
