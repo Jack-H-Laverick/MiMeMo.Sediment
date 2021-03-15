@@ -3,7 +3,7 @@
 
 rm(list=ls())                                                               # Wipe the brain
 
-packages <- c("MiMeMo.tools", "tidyverse", "sf", "tictoc", "ncdf4", "data.table", "raster") # List packages
+packages <- c("MiMeMo.tools", "ncdf4", "data.table", "raster")              # List packages
 lapply(packages, library, character.only = TRUE)                            # Load packages
 source("./R scripts/@_Set up file.R")
 
@@ -83,9 +83,9 @@ domains_mask <- expand.grid(Longitude = Space$Lons, Latitude = Space$Lats) %>%  
          y_index = match(Latitude, Space$Lats) + Space$Limits$Lat_start - 1)    # Find y index in the netcdf file each pixel sits at
 toc()
 
-ggplot(domains_mask) + geom_sf(aes(colour = Region), size = 0.1)                   # Check
+ggplot(domains_mask) + geom_sf(aes(colour = Region), size = 0.1)            # Check
 
-saveRDS(domains_mask, "./Objects/ECMWF Targets.rds")                            # Save
+saveRDS(domains_mask, "./Objects/ECMWF Targets.rds")                        # Save
 
 #### Tides SINMOD ####
 

@@ -3,10 +3,10 @@
 
 rm(list=ls())                                                            # Wipe the brain
 
-packages <- c("MiMeMo.tools", "tidyverse", "fs", "tictoc", "furrr")      # List packages
+packages <- c("MiMeMo.tools", "fs", "furrr")                             # List packages
 lapply(packages, library, character.only = TRUE)                         # Load packages
 
-plan(multiprocess)                                                       # Set paralell processing
+plan(multisession)                                                       # Set paralell processing
 
 SINMOD_mask <- readRDS("./Objects/SINMOD Targets.rds")                   # Import locations of traget pixels in SINMOD grid
 
