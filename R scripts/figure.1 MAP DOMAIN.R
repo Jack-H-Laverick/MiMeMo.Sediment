@@ -41,7 +41,6 @@ map <- ggplot() +
   coord_sf(ylim = c(5137274, 6864274), xlim = c(1689877, 6182403), expand = F) +
   scale_y_continuous(breaks = 60) +
   scale_x_continuous(breaks = c(-30, 0, 30)) +
-#  theme_minimal() +
   theme(text = element_text(family = "Avenir", size = 10),
         panel.border = element_rect(colour = "grey", fill = NA)) +
   facet_wrap(vars(label)) +
