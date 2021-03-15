@@ -3,55 +3,14 @@
 
 rm(list=ls())                                                               # Wipe the brain
 
-packages <- c("MiMeMo.tools", "tidyverse", "tictoc", "furrr", "sf")         # List packages
+packages <- c("MiMeMo.tools", "furrr")                                      # List packages
 lapply(packages, library, character.only = TRUE)                            # Load packages
 source("./R scripts/@_Set up file.R")
 
-plan(multiprocess)
+plan(multisession)
 
 pairs <- readRDS("./Objects/Water look up table.rds")                       # Import pairings between wave and tide pixels
-pairs_chunked <- split(pairs, (seq(nrow(pairs)) -1) %/% 200)               # Split into chunks of 1000 rows
-
-#### Save out chunks ####
-
-#wave_ts <- readRDS("./Objects/Wave_ts.rds")                                 # Read in a list of time series for waves at pixels
-
-#tic()
-#future_imap(pairs_chunked, ~{wave_ts[.x$wave_entry] %>%  
-#                     saveRDS(glue::glue("./Objects/Time shift/wave{.y}.rds"))
-#                      print(glue::glue("{.y}/1290"))}, .progress = TRUE)
-#toc()
-
-#rm(wave_ts)
-
-# tic()
-# map(pairs_chunked, ~{wave_ts[.x$wave_entry] }) %>% 
-#   imap( ~ { saveRDS(.x, glue::glue("./Objects/Time shift/wave{.y}.rds"))})
-# 
-# rm(wave_ts)
-# toc()
-
-#tide_ts <- readRDS("./Objects/Tide_ts.rds")                                 # Read in a list of time series for tides at pixles
-
-#tic()
-#imap(pairs_chunked, ~{tide_ts[.x$tide_entry] %>% 
-#                      saveRDS(glue::glue("./Objects/Time shift/tide{.y}.rds"))
-#print(glue::glue("{.y}/1290"))}, .progress = TRUE)
-#toc()
-
-#rm(tide_ts)
-
-#### Bind chunks ####
-
-#tic()
-#future_map(0:(length(pairs_chunked)-1), ~ { 
-  
-#  map2(readRDS(glue::glue("./Objects/Time shift/tide{.x}.rds")),
-#       readRDS(glue::glue("./Objects/Time shift/wave{.x}.rds")),
-#       cbind) %>%
-#  saveRDS(glue::glue("./Objects/stress_input/{.x}.rds"))
-#  gc()}, .progress = T)
-#toc()
+pairs_chunked <- split(pairs, (seq(nrow(pairs)) -1) %/% 200)                # Split into chunks of 1000 rows
 
 #### function ####
 
@@ -88,14 +47,6 @@ stress <- quantile(stress$shear_mean, percentile)                # Calculate the
 depths <- map(pairs_chunked, ~{ as.list(.[,"Depth"])})
 
 print("Start calculations")
-
-#tic()
-#stress <- future_map(0:(length(pairs_chunked)-1), ~ {
-
-#  cbind(readRDS(glue::glue("./Objects/Time shift/tide{.x}.rds")),
-#       readRDS(glue::glue("./Objects/Time shift/wave{.x}.rds"))) %>%
-#  map2(depths[[(.x+1)]], calculate_stress, percentile = 0.95)}, .progress = T)
-#toc()
 
  tic()
  stress <- future_map(0:(length(pairs_chunked)-1), ~ {
