@@ -92,7 +92,7 @@ new_grid <- st_join(readRDS("./Objects/RF_sediment_observations.rds"),          
   drop_na()  
 
 layers <- map(as.list(as.character(1:12)), ~{
-    raster <- new_grid[,c("Longitude", "Latitude", var)] %>% 
+    raster <- new_grid[,c("Longitude", "Latitude", .x)] %>% 
       rasterFromXYZ()}) %>% 
   brick()
 
