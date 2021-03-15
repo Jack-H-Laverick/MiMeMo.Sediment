@@ -1,10 +1,8 @@
 
 ## Run batches of R scripts. Handy if you want scripts to run after another finishes while you're away from the machine
 
-library(tidyverse)
-
-scripts <- c(                                            # List scripts in the order you want to run them
-#  "./R scripts/sediment.00 DOMAINS.R",
+purrr::walk(c(                                            
+  # "./R scripts/sediment.00 DOMAINS.R",
   # "./R scripts/sediment.01 GRID WATER.R",
   # "./R scripts/sediment.02 CROP SINMOD.R", 
   # "./R scripts/sediment.03 CROP WAVES.R",
@@ -16,13 +14,22 @@ scripts <- c(                                            # List scripts in the o
   # "./R scripts/sediment.09 H2O.R",
   # "./R scripts/sediment.10 SEDIMENT FRACTIONS.R",
   # "./R scripts/sediment.11 WRITE CSV.R",
-  # "./R scripts/sediment.12 OMC.R",
-  # "./R scripts/sediment.13 PERM PORE.R",
-  # "./R scripts/sediment.14 WRITE NETCDF.R",
-  # "./R scripts/sediment.15 SEASONAL STRESS.R",
-  "./R scripts/sediment.16 DAILY DISTURBANCE.R",
-  "./R scripts/sediment.17 RASTERISE DISTURBANCE.R"
-  #"./R scripts/sediment.18 SEASONLA DISTURBANCE.R",
-  #"./R scripts/sediment.19 ZONAL SUMMARIES.R"
-) %>% 
-  map(MiMeMo.tools::execute)
+  # "./R scripts/sediment.12 NITROGEN CONTENT.R",
+  # "./R scripts/sediment.13 CARBON CONTENT.R",
+  # "./R scripts/sediment.14 PERM PORE.R",
+  # "./R scripts/sediment.15 WRITE NETCDF.R",
+  # "./R scripts/sediment.16 SEASONAL STRESS.R",
+  # "./R scripts/sediment.17 DAILY DISTURBANCE.R",
+  # "./R scripts/sediment.18 RASTERISE DISTURBANCE.R",
+  # "./R scripts/sediment.19 SEASONAL DISTURBANCE.R",
+  # "./R scripts/sediment.20 ZONAL SUMMARIES.R",
+  # "./R scripts/figure.0 MAP BACKGROUND.R",
+  # "./R scripts/figure.1 MAP DOMAIN.R",
+  # "./R scripts/figure.2 SCHEMATIC.R",
+   "./R scripts/figure.4 SEDIMENT FRACTIONS.R",
+   "./R scripts/figure.5 D50.R",
+   "./R scripts/figure.6 PERMEABILITY AND POROSITY.R",
+   "./R scripts/figure.7 OMC.R",
+   "./R scripts/figure.8 STRESS AND DISTURBANCE.R",
+   "./R scripts/figure.supplementary SEASONAL.R"
+), MiMeMo.tools::execute)
