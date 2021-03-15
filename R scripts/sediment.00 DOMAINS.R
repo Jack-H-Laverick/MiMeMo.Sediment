@@ -6,7 +6,7 @@ rm(list=ls())                                                                 # 
 Packages <- c("tidyverse", "stars", "raster", "tictoc", "sf", "data.table", "furrr")        # List handy data packages
 lapply(Packages, library, character.only = TRUE)                              # Load packages
 
-plan(multiprocess)
+plan(multisession)
 source("./R scripts/@_Set up file.R")
 
 #### Import bathymetry ####
@@ -18,7 +18,7 @@ crs(crop) <- crs(raster)                                   # Match crs to bathym
 
 raster <- crop(raster, crop)                               # Crop bathymetry
 
-raster[raster < -400] <- NA                                # Blank out points deeper than 400 m
+raster[raster < -500] <- NA                                # Blank out points deeper than 500 m
 raster[raster > 0] <- 0                                    # Level all land to 0 m for easy selection 
 
 #### Calculate terrain ####
@@ -39,19 +39,25 @@ area <- raster
 area[area < 0] <- 10                                # Level all land to 10 m for easy selection 
 area[area == 0] <- NA                               # Match values below sea level so SF objects merge into a polygon
 
-area <- st_as_stars(area) %>% 
-  st_as_sf(merge = TRUE) %>% 
-  st_union()
+BS <- st_as_stars(area) %>%                         # If the result is large, returns a stars_proxy object
+  .[Barents_mask] %>%                               # So clip
+  st_as_stars() %>%                                 # And convert to a stars object in memory
+  st_as_sf(merge = TRUE) %>%                        # So we can merge into polygons 
+  st_union() %>%                                    # And stitch as a single SF object
+  st_as_sf(Region = "Barents Sea")                  # Create a full sf object
 
-plot(st_transform(area, crs = 3035))
+GL <- st_as_stars(area) %>%                         # If the result is large, returns a stars_proxy object
+  .[Greenland_mask] %>%                             # So clip
+  st_as_stars() %>%                                 # And convert to a stars object in memory
+  st_as_sf(merge = TRUE) %>%                        # So we can merge into polygons 
+  st_union() %>%                                    # And stitch as a single SF object
+  st_as_sf(Region = "Greenland Sea")                # create a full sf object
 
-domain <- rbind(st_intersection(st_transform(Barents_mask, crs = 3035), 
-                                st_transform(area, crs = 3035)), 
-                st_intersection(st_transform(Greenland_mask, crs = 3035), 
-                                st_transform(area, crs = 3035))) 
+domain <- bind_rows(st_transform(BS, crs = 3035), 
+                    st_transform(GL, crs = 3035)) 
 
-saveRDS(domain, "./Objects/Domain.rds")                                        # Import mapped areas for plotting
 plot(domain)
+saveRDS(domain, "./Objects/Domain.rds")                                        # Import mapped areas for plotting
 
 #### Downsample grid to 0.01 x 0.01 ####
 
@@ -102,7 +108,7 @@ point <- data.frame(x= 25, y = 75, region = "inset") %>%          # Choose a poi
   st_transform(crs = 3035)
 
 inset <- cells[st_buffer(point, 3000)] %>%                        # Cut the grid within 3km of the point
-  st_as_sf(points = FALSE, merge = FALSE) %>%
+  st_as_sf(as_points = FALSE, merge = FALSE) %>%
   st_intersection(st_buffer(point, 2000))                         # Cut out a circle with a 2km radius to get a perfect cirlce
 saveRDS(inset, "./Objects/inset.rds")
 
