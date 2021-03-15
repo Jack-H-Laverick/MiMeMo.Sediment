@@ -60,4 +60,4 @@ C <- ggplot(raster) +
 
 N/C
 
-ggsave("./Figures/Figure 7 OMC.png", width = 13, height = 14, units = "cm", dpi = 1500)
+ggsave("./Figures/Figure 7 OMC.png", width = 13, height = 14, units = "cm", dpi = 700)

@@ -86,4 +86,4 @@ D <- ggplot() +
 
 S/D
 
-ggsave("./Figures/Figure 8 movement.png", width = 13, height = 14, units = "cm", dpi = 1500)
+ggsave("./Figures/Figure 8 movement.png", width = 13, height = 14, units = "cm", dpi = 700)
