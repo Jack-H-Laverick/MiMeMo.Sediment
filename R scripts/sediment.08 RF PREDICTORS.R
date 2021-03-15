@@ -62,7 +62,7 @@ Terrain <- star_terrain(x = bath_star,                                        # 
                         y = bathymetry,                                       # Using samples (which also have bathymetry information appended)
                         c("slope", "TPI", "TRI", "roughness")) %>%            # Calculate variables in raster::terrain function
   data.frame(bathymetry) %>%                                                  # Bind into a dataframe and add bathymetry
-  filter(between(elevation, -400, 0)) %>%                                     # Drop pixels outside our depth range 
+  filter(between(elevation, -500, 0)) %>%                                     # Drop pixels outside our depth range 
   mutate(elevation = abs(elevation)) %>%                                      # Convert elevation to depth
   st_as_sf()                                                                  # Reinstate SF class
 toc()
@@ -94,7 +94,7 @@ Stress <- st_join(Sediment,                                                   # 
 
 ggplot(Stress, aes(x = Longitude, y = Latitude, fill = Sed_class)) +          # Check the bathymetry looks believable
   geom_raster() +
-scale_fill_viridis(name = 'Sediment', na.value = "red")
+  scale_fill_viridis(name = 'Sediment', na.value = "red")
 
 shear_star <- st_rasterize(Stress["Stress95"], dx = 0.01, dy = 0.01) # Extract bottom classification
 
