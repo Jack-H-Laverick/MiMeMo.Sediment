@@ -148,4 +148,4 @@ ggplot() +
         legend.position = "bottom")+
   NULL
 
-#ggsave("./Figures/Figure 2.png", width = 16, height = 8, units = "cm", dpi = 1500)
+ggsave("./Figures/Figure 2.png", width = 16, height = 8, units = "cm", dpi = 1500)
