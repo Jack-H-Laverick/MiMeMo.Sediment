@@ -3,10 +3,10 @@
 
 rm(list=ls())                                                                # Wipe the brain
 
-packages <- c("MiMeMo.tools", "raster", "tidyverse", "sf", "tictoc", "ncdf4", "furrr") # List packages
+packages <- c("MiMeMo.tools", "raster", "ncdf4", "furrr", "largeList")       # List packages
 lapply(packages, library, character.only = TRUE)                             # Load packages
 
-plan(multiprocess)
+plan(multisession)
 
 #### Tides ####
 
@@ -55,14 +55,21 @@ interp_time <- function(wave_ts, wave_step, tide) {
     as.data.frame()
 }}                      # Interpolate waves to tides
 
-tic()
-zooed <- map(1:7, ~ {             # For each chunk
-  readRDS(glue::glue("./Objects/Time shift/{.}.rds")) %>%                   # Read in the file
-   future_map(interp_time, wave_step, tide_dummy, .progress = T)}) %>%       # Align with tide time series in parallel
-   unlist(recursive = F)                                                     # Remove top level of the list
-toc()
+ tic()
+ zooed <- map(1:7, safely(~ {                                                        # For each chunk
+   readRDS(stringr::str_glue("./Objects/Time shift/{.x}.rds")) %>%                    # Read in the file
+   future_map(interp_time, wave_step, tide_dummy, .progress = T) %>% 
+   saveRDS(stringr::str_glue("./Objects/Wave_ts_{.x}.rds"))}))# %>%       # Align with tide time series in parallel
+#    unlist(recursive = F)                                                     # Remove top level of the list
+ toc()
+ 
+saveList(object = readRDS("./Objects/Wave_ts_1.rds"), file = "./Objects/Wave_ts.llo", append = FALSE, compress = TRUE)
+ 
+walk(stringr::str_glue("./Objects/Wave_ts_{2:7}.rds"), ~{ 
+  saveList(object = readRDS(.x), file = "./Objects/Wave_ts.llo", append = TRUE)})
+ 
 
-saveRDS(zooed, "./Objects/Wave_ts.rds")                                      # Save out list of time series
+#saveRDS(zooed, "./Objects/Wave_ts.rds")                                      # Save out list of time series
 
 ## clean up
 
