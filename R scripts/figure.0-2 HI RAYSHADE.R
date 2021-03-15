@@ -58,14 +58,12 @@ plot_3d(shaded, mat, asp = (raster2@extent@xmax - raster2@extent@xmin) /        
 
 
 tic()
-render_highquality(parallel = TRUE, #filename = "./Figures/rayshade-hi.png",
+render_highquality(parallel = TRUE, filename = "./Figures/rayshade-hi.png",
                    scene_elements = bind_rows(rayrender::text3d(label = "Greenland Sea", text_height = (425*5), 
                                                 material = rayrender::metal(),
                                                 y = (800*5), x = (-2000*5), z = (-1500*5), angle = c(60,0,0)),
                                               rayrender::text3d(label = "Barents Sea", text_height = (425*5), 
                                                 material = rayrender::metal(),
-                                                y = (800*5), x = (2500*5),z = (-1500*5), angle = c(60,0,0)),
-                                              rayrender::sphere(radius = 25, 
-                                                material = rayrender::light(intensity = 1000), y = 400)),
-                   samples = 2000, min_variance = 0, lightintensity = 0)
+                                                y = (800*5), x = (2500*5),z = (-1500*5), angle = c(60,0,0))),
+                   samples = 2000, min_variance = 0)
 toc()
