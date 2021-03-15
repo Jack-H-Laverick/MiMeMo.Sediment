@@ -20,13 +20,13 @@ proj <- rgdal::make_EPSG() %>%                                                # 
   filter(code == crs)
 
 target <- raster("./Output/Greenland_and_barents_sea_shelf_sediments.nc",     # Use the our data products as a template 
-                 var = "Hard") %>% 
+                 var = "Rock") %>% 
   projectRaster(crs = proj$prj4) %>%                                          # Reproject to project projection 
   as.data.frame(xy = T) %>%                                                   # Convert to a data frame
   drop_na() %>%                                                               # Drop NAs
   rasterFromXYZ(crs = proj$prj4)                                              # Back to Raster (with no empty border)
   
-raster2 <- projectRaster(raster, to = target)                                 # PRoject bathymetry onto new grid
+raster2 <- projectRaster(raster, to = target)                                 # Project bathymetry onto new grid
 
 plot(raster2)                                                                 # Visual check
 
