@@ -39,8 +39,8 @@ Validation <- Data %>%
 
 #### Points to predict for ####
 
-To_predict <- readRDS("./Objects/RF_sediment_observations.rds") %>% # Read in data
-  filter(is.na(Sed_class)) %>%                                  # Limit to points we don't know about sediment
+To_predict <- readRDS("./Objects/RF_sediment_observations.rds") %>%    # Read in data
+  filter(is.na(Sed_class)) %>%                                         # Limit to points we don't know about sediment
   dplyr::select(-Sed_class) %>%                                        # Drop the sediment columns so we can drop NAs
   drop_na() 
 
@@ -70,7 +70,7 @@ toc()
 
 Importance <- h2o.varimp(RF)
 
-Imp_plot <- ggplot() + 
+ggplot() + 
   geom_point(data = Importance, aes(y = scaled_importance, x = reorder(variable, scaled_importance)), colour = "grey", 
              shape = 21, size = 5, fill = "white", stroke = 0.5) +
   theme_minimal() +
@@ -81,7 +81,7 @@ Imp_plot <- ggplot() +
         text = element_text(family = "Avenir", size = 10)) +
   NULL
 
-ggsave("./Figures/Importance.png", plot = Imp_plot)
+ggsave("./Figures/Importance.png")
 
 #### Condense sediment classes ####
 
