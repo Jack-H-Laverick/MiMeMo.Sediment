@@ -36,8 +36,8 @@ stdev <- map_df(vars, ~{
 }) %>% 
   pivot_wider(names_from =Var, values_from = Value)
 
-#write.csv(mean, "means")
-#write.csv(stdev, "devs")
+write.csv(mean, "means")
+write.csv(stdev, "devs")
 
 #### Summaries for movements ####
 
@@ -69,5 +69,5 @@ stdev <- map_df(vars, ~{
   pivot_wider(names_from = Var, values_from = Value) %>% 
   separate(Month, into = c(NA, "Month"), sep = "X")
 
-#write.csv(mean, "seasonal_means")
-#write.csv(stdev, "seasonal_devs")
+write.csv(mean, "seasonal_means")
+write.csv(stdev, "seasonal_devs")
