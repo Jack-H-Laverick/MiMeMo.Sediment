@@ -49,8 +49,23 @@ readxl::read_excel("./Data/Combined porosity POC PON data extended.xlsx") %>%
   ggplot() +
   geom_point(aes(x=Longitude, y= Latitude))
 
+## 90s data ##
 
+GL <- read.table("./Data/surface_sedimentology.tab", skip = 67, header = T, sep = "\t") %>% # Import OMC skipping meta data
+  .[,c(2,3,6, 7, 13,14)]                                                          # Select columns of interest
 
+names(GL) <- c("Latitude", "Longitude", "clay", "Silt", "TOC", "C/N")             # Rename sensibly
+
+GLrelationship <- mutate(GL, Silt = (clay+Silt)/100,                                    # Convert "Sand and larger" to "Silt or smaller"
+                       N_org = (TOC/`C/N`)/100) %>%                               # Convert % to proportion for betareg, and TOC to TON
+  drop_na()                                                                       # Drop incomplete cases
+
+model_GL <- betareg(N_org ~ Silt, GLrelationship)                                 # Fit a beta regression
+
+summary(model_GL)
+
+fit_GL <- data.frame(Silt = seq(0,1,0.01)) %>% 
+  mutate(N_org = as.numeric(predict(model_GL, newdata=., type='response')))       # Create a line of expected values
 
 
 #### plot ####
@@ -60,6 +75,8 @@ ggplot() +                                       # Plot
   geom_line(data = fit, aes(x=Silt, y=N_org * 100), colour = "blue") +
   geom_point(data = NS, aes(x=Silt, y=N_org * 100), colour = "red", alpha = 0.5, size = 1) +
   geom_line(data = fit_NS, aes(x=Silt, y=N_org * 100), colour = "red") +
+  geom_point(data = GLrelationship, aes(x=Silt, y=N_org * 100), colour = "green", alpha = 0.5, size = 1) +
+  geom_line(data = fit_GL, aes(x=Silt, y=N_org * 100), colour = "green") +
   annotate("text", x = 0.01, y = 0.45, colour = "red", hjust = 0,
            label = str_glue("North Sea, 
            Int = {round(model_NS$coefficients$mean[1],2)}, 
@@ -70,6 +87,11 @@ ggplot() +                                       # Plot
                             Int = {round(model$coefficients$mean[1],2)}, 
                             'slope' = {round(model$coefficients$mean[2],2)}
                              R2 = {round(model$pseudo.r.squared, 3)}")) +
+  annotate("text", x = 0.4, y = 0.45, colour = "green", hjust = 0, 
+           label = str_glue("Greenland Sea, 
+                            Int = {round(model_GL$coefficients$mean[1],2)}, 
+                            'slope' = {round(model_GL$coefficients$mean[2],2)}
+                             R2 = {round(model_GL$pseudo.r.squared, 3)}")) +
   theme_minimal() +
   labs(x = "Proportion silt or finer", y = "Organic nitrogen (%)")
 
@@ -83,7 +105,7 @@ csv <- csv %>%
   mutate(Silt = Silt * 100,                                                        # Convert back to percentages
          TON = TON * 100) 
 
-data.table::fwrite(csv, "./Output/Greenland_and_barents_sea_shelf_sediments.csv")  # Save csv appendix
+#data.table::fwrite(csv, "./Output/Greenland_and_barents_sea_shelf_sediments.csv")  # Save csv appendix
 
 #### Also add to object destined to become netcdf file ####
 
@@ -91,5 +113,5 @@ readRDS("./Objects/Everything.rds") %>%
   mutate(Silt = Silt/100) %>%                                                      # Convert silt to a proportion for the model
   mutate(TON = as.numeric(predict(model, newdata=., type='response'))) %>%         # Make predictions
   mutate(Silt = Silt*100,                                                          # Convert back to percentages
-         TON = TON*100) %>%
-  saveRDS("./Objects/Everything.rds")                                              # Save with geometry for making netcdf later 
+         TON = TON*100) #%>%
+#  saveRDS("./Objects/Everything.rds")                                              # Save with geometry for making netcdf later 
