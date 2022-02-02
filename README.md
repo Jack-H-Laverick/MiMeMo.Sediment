@@ -47,7 +47,8 @@ and mean daily disturbance by month.
 | 04 D50                       | Map mean grain size.                                                         |
 | 05 SEDIMENT FRACTIONS        | Map the proportions of different sediment fractions.                         |
 | 06 PERMEABILITY AND POROSITY | Map porosity and permeability.                                               |
-| 07 OMCS                      | Map organic carbon and nitrgoen content.                                     |
+| 07 OMCS                      | Map organic carbon and nitrogen content.                                     |
 | 08 STRESS AND DISTURBANCE    | Map bed shear stress and sediment disturbance.                               |
+| supp OMC                     | Compare organic matter field data for the Barents, North, and Greenland Seas.|
 | supp SEASONAL                | Map the seasonal cycles of bed shear stress and sediment disturbance.        |
 
