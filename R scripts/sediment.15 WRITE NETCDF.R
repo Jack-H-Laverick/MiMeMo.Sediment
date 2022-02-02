@@ -75,7 +75,7 @@ writeRaster(get_raster("Silt"),
  writeRaster(get_raster("Porosity"),
              "./Objects/Porosity.nc", overwrite = TRUE, format = "CDF", 
              varname= "Porosity", longname = "Porosity", 
-             varunit = "%", xname = "Longitude", yname = "Latitude")
+             varunit = "Proportion", xname = "Longitude", yname = "Latitude")
 
  writeRaster(get_raster("Permeability"),
              "./Objects/Permeability.nc", overwrite = TRUE, format = "CDF", 
