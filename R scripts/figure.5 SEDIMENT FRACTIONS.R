@@ -43,4 +43,4 @@ ggplot() +
                                 title.hjust = 0.5, title.position = "top"))+
 NULL
 
-ggsave("./Figures/Figure 5.png", width = 9, height = 14, units = "cm", dpi = 700)
+ggsave("./Figures/Figure 5.png", width = 10, height = 14, units = "cm", dpi = 700)

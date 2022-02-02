@@ -26,13 +26,15 @@ Por <- ggplot() +
   ggpubr::background_image(png::readPNG("./Figures/background.png")) +
   geom_path(data = marks, aes(x=x, y=y, group = graticule), colour = "grey", size = 0.2) + # Add Graticules 
   geom_raster(data = Porosity, aes(x=x, y=y, fill = Porosity)) +               # Add rasters
-  viridis::scale_fill_viridis(name = NULL, option = "E") +        # Specify fill
+  viridis::scale_fill_viridis(name = NULL, option = "E",      # Specify fill
+                              breaks = seq(0.4, 0.7, by = 0.1),
+                              labels = paste0(seq(0.4, 0.7, by = 0.1), "%")) + # Specify fill
   sediment_aes +                                                               # Use consistent aesthetics
   facet_wrap(vars(Var)) +                                          # Facet by month
  # guides(fill = guide_colourbar(barheight = 0.5, barwidth = 15, title.vjust = 1, 
 #                                title.hjust = 0.5, title.position = "top"))+
   NULL
-
+  
 #### Permeability ####
 
 Permeability <- raster("./Output/Greenland_and_barents_sea_shelf_sediments.nc", varname = "Permeability") %>%
@@ -56,7 +58,7 @@ ggplot() +
                                          expression("1" ~ e^-9 ~ m^2)),
                               option = "E", trans = "log")+
   sediment_aes +                                                                           # Use consistent aesthetics
-  facet_wrap(vars(Var)) +                                          # Facet by month
+  facet_wrap(vars(Var)) +                                                                  # Facet by month
 #  guides(fill = guide_colourbar(barheight = 0.5, barwidth = 15, title.vjust = 1, 
 #                                title.hjust = 0.5, title.position = "top"))+
   NULL

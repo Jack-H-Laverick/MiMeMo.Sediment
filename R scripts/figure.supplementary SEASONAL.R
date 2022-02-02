@@ -42,7 +42,7 @@ ggplot() +
                                 title.hjust = 0.5, title.position = "top"))+
   NULL
 
-ggsave("./Figures/Figure supp stress.png", width = 13, height = 20, units = "cm", dpi = 1500)
+ggsave("./Figures/Figure supp stress.png", width = 13, height = 20, units = "cm", dpi = 800)
 
 #### Disturbance ####
 
@@ -78,4 +78,4 @@ ggplot() +
                                 title.hjust = 0.5, title.position = "top"))+
   NULL
 
-ggsave("./Figures/Figure supp disturbance.png", width = 13, height = 20, units = "cm", dpi = 1500)
+ggsave("./Figures/Figure supp disturbance.png", width = 13, height = 20, units = "cm", dpi = 800)
