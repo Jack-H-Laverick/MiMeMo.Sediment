@@ -30,6 +30,7 @@ Predictions <- readRDS("./Objects/Full sediment.rds") %>%
 #### Join data ####
 
 Everything <- left_join(To_predict, Predictions, by = c("x", "y")) %>% # Join by pixel
+  select(-Stress95) %>% 
   rename(Longitude = "x", Latitude = "y", TRI = "tri",                 # Rename variables 
          TPI = "tpi", Roughness = "roughness", Slope = "slope",
          Dxbar = "D50", Rock = "Hard") %>% 
