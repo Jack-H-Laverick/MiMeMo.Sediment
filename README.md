@@ -3,9 +3,12 @@
 # MiMeMo.Sediment
 
 This page details at a broad level the code written to create synthetic
-sediment maps of the Barents and Greenland sea. These are going to be
-used to parameterise StrathE2E*Polar* as part of MiMeMo, but other
-people may find them useful too\!
+sediment maps of the Barents and Greenland sea. These have been used to
+parameterise StrathE2E*Polar* as part of MiMeMo, but other people may find 
+them useful too\!
+
+The data can be accessed [here](https://doi.org/10.15129/bb91fbc2-b4e9-4919-9631-bee4fb231a92) while
+the journal article can be found [here](). Please cite the paper and data product if you use the output.
 
 In brief, wave action, water velocities, and bathymetry are fed into a
 random forest model. The model is trained on an overview document of the
