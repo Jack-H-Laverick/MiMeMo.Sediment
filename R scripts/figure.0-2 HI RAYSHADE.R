@@ -49,21 +49,18 @@ add_shadow(ray_shade(mat, multicore = T, progbar = T), 0.9) %>%             # Pa
 #plot_map(shaded, asp = (raster2@extent@xmax - raster2@extent@xmin) /          # Plot with the correct aspect ratio
 #                     (raster2@extent@ymax - raster2@extent@ymin))  
 
-plot_3d(shaded, mat, asp = (raster2@extent@xmax - raster2@extent@xmin) /          # Plot with the correct aspect ratio
-                     (raster2@extent@ymax - raster2@extent@ymin),
-        zscale = 20, fov = 0, theta = 0, phi = 60, 
-        windowsize = c(1200, 675), zoom = 0.65,
+plot_3d(shaded, mat, zscale = 20, fov = 0, theta = 0, phi = 60, 
+        windowsize = c(1200, 600), zoom = 0.5,
         water = TRUE, waterdepth = 0, wateralpha = 0.75, watercolor = "lightblue",
-        waterlinecolor = "white", waterlinealpha = 0.5)  
-
+        waterlinecolor = "white", waterlinealpha = 0.5, asp = 1/cospi(65/180))  
 
 tic()
 render_highquality(parallel = TRUE, filename = "./Figures/rayshade-hi.png",
                    scene_elements = bind_rows(rayrender::text3d(label = "Greenland Sea", text_height = (425*5), 
                                                 material = rayrender::metal(),
-                                                y = (800*5), x = (-2000*5), z = (-1500*5), angle = c(60,0,0)),
+                                                y = (800*5), x = (-2000*5), z = (-1500*5), angle = c(-30,0,0)),
                                               rayrender::text3d(label = "Barents Sea", text_height = (425*5), 
                                                 material = rayrender::metal(),
-                                                y = (800*5), x = (2500*5),z = (-1500*5), angle = c(60,0,0))),
+                                                y = (800*5), x = (2500*5),z = (-1500*5), angle = c(-30,0,0))),
                    samples = 2000, min_variance = 0)
 toc()
